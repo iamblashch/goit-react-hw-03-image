@@ -92,10 +92,7 @@ export class App extends Component {
           <Modal imgUrl={largeImageUrl} onClose={this.toggleModal} />
         )}
       {pictures.length > 0 && (
-        <>
           <GalleryList pictures={pictures} onClickImg={this.largeImage} />
-          {loadMore === 0 && <LoadMoreBtn onClick={this.handleLoadMore} />}
-        </>
       )}
         {loadMore === 0 && <LoadMoreBtn onClick={this.handleLoadMore} />}
         {status === "loading" && <Loader/>}
