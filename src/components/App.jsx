@@ -91,7 +91,12 @@ export class App extends Component {
         {showModal && (
           <Modal imgUrl={largeImageUrl} onClose={this.toggleModal} />
         )}
-        <GalleryList pictures={pictures}  onClickImg={this.largeImage}/>
+      {pictures.length > 0 && (
+        <>
+          <GalleryList pictures={pictures} onClickImg={this.largeImage} />
+          {loadMore === 0 && <LoadMoreBtn onClick={this.handleLoadMore} />}
+        </>
+      )}
         {loadMore === 0 && <LoadMoreBtn onClick={this.handleLoadMore} />}
         {status === "loading" && <Loader/>}
       </div>
