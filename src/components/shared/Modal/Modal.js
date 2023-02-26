@@ -10,7 +10,7 @@ export class Modal extends Component {
     window.addEventListener('keydown', this.handleKeydown);
   }
 
-  componentDidUpdate() {
+  componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeydown);
   }
 
@@ -40,5 +40,5 @@ export class Modal extends Component {
 }
 
 Modal.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  imgUrl: PropTypes.string.isRequired,
 };

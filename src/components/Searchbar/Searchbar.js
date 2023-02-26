@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 import { CiSearch } from 'react-icons/ci';
 
@@ -28,15 +29,15 @@ class Searchbar extends Component {
       <header className={css.Searchbar}>
         <form className={css.SearchForm} onSubmit={this.handleSubmit}>
           <button type="submit" className={css.SearchForm__button}>
-          <CiSearch className={css.icon}/>
+            <CiSearch className={css.icon} />
             <span className={css.SearchForm__button_label}></span>
           </button>
 
           <input
             className={css.SearchForm__input}
             type="text"
-            autocomplete="off"
-            autofocus
+            autoComplete="off"
+            autoFocus
             placeholder="Search images and photos"
             onChange={this.searchResult}
             value={search}
@@ -49,3 +50,6 @@ class Searchbar extends Component {
 
 export default Searchbar;
 
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { fetchImg } from './Api/Api';
+import { fetchImg } from '../api/api';
 
 import Searchbar from './Searchbar/Searchbar';
 import { GalleryList } from './ImageGallery/ImageGallery';
@@ -39,14 +39,26 @@ export class App extends Component {
   };
 
   searchResult = value => {
-    if(value === this.state.query){
-      return
+    if (!value.trim()) {
+      this.setState({ status: 'error' });
+      alert('Please enter a valid search term');
+      return;
     }
+    if (!value.match(/^[a-zA-Z0-9-_ ]*$/)) {
+      alert('Invalid search query');
+      return;
+    }
+  
+    if (value === this.state.query) {
+      return;
+    }
+  
     this.setState({
       query: value,
       page: 1,
       pictures: [],
       loadMore: null,
+      status: 'idle',
     });
   };
 
@@ -63,7 +75,7 @@ export class App extends Component {
         .then(e =>
           this.setState(prevState => ({
             pictures: [...prevState.pictures, ...e.hits],
-            status: 'idle',
+            status: '',
             loadMore: 12 - e.hits.length,
           }))
         )
