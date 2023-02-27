@@ -1,55 +1,43 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 import { CiSearch } from 'react-icons/ci';
 
-class Searchbar extends Component {
-  state = {
-    search: '',
-  };
-  searchResult = event => {
-    this.setState({
-      search: event.currentTarget.value,
-    });
-  };
+const Searchbar = ({ onSubmit }) => {
+const [search, setSearch] = useState('');
 
-  handleSubmit = event => {
-    event.preventDefault();
-    const { search } = this.state;
+const handleSubmit = event => {
+event.preventDefault();
+onSubmit(search);
+setSearch('');
+};
 
-    this.props.onSubmit(search);
-    this.setState({
-      search: '',
-    });
-  };
+const handleSearch = event => {
+setSearch(event.currentTarget.value);
+};
 
-  render() {
-    const { search } = this.state;
-    return (
-      <header className={css.Searchbar}>
-        <form className={css.SearchForm} onSubmit={this.handleSubmit}>
-          <button type="submit" className={css.SearchForm__button}>
-            <CiSearch className={css.icon} />
-            <span className={css.SearchForm__button_label}></span>
-          </button>
-
-          <input
-            className={css.SearchForm__input}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            onChange={this.searchResult}
-            value={search}
-          />
-        </form>
-      </header>
-    );
-  }
-}
-
-export default Searchbar;
+return (
+<header className={css.Searchbar}>
+<form className={css.SearchForm} onSubmit={handleSubmit}>
+<button type="submit" className={css.SearchForm__button}>
+<CiSearch className={css.icon} />
+<span className={css.SearchForm__button_label}></span>
+</button>
+<input
+      className={css.SearchForm__input}
+      type="text"
+      autoComplete="off"
+      autoFocus
+      placeholder="Search images and photos"
+      onChange={handleSearch}
+      value={search}
+    />
+  </form>
+</header>
+);
+};
 
 Searchbar.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
+onSubmit: PropTypes.func.isRequired,
 };
+export default Searchbar;

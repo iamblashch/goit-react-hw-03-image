@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { fetchImg } from '../api/api';
 
 import Searchbar from './Searchbar/Searchbar';
@@ -8,39 +9,31 @@ import { Modal } from './shared/Modal/Modal';
 import { Loader } from "./Loader/Loader";
 import css from './App.module.css';
 
+function App() {
+  const [pictures, setPictures] = useState([]);
+  const [status, setStatus] = useState('idle');
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const [loadMore, setLoadMore] = useState(null);
+  const [largeImageUrl, setLargeImageUrl] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-
-export class App extends Component {
-  state = {
-    pictures: [],
-    status: 'idle',
-    page: 1,
-    query: '',
-    loadMore: null,
-    largeImageUrl: '',
-    showModal: false,
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  toggleModal = () => {
-    this.setState(state => ({
-      showModal: !state.showModal,
-    }));
-  };
-
-  largeImage = (imgUrl) => {
-    this.setState({largeImageUrl:imgUrl})
-    this.toggleModal();
+  const largeImage = (imgUrl) => {
+    setLargeImageUrl(imgUrl);
+    toggleModal();
   }
 
-  handleLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const handleLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  searchResult = value => {
+  const searchResult = value => {
     if (!value.trim()) {
-      this.setState({ status: 'error' });
+      setStatus('error');
       alert('Please enter a valid search term');
       return;
     }
@@ -49,54 +42,51 @@ export class App extends Component {
       return;
     }
   
-    if (value === this.state.query) {
+    if (value === query) {
       return;
     }
   
-    this.setState({
-      query: value,
-      page: 1,
-      pictures: [],
-      loadMore: null,
-      status: 'idle',
-    });
+    setQuery(value);
+    setPage(1);
+    setPictures([]);
+    setLoadMore(null);
+    setStatus('idle');
   };
 
-  async componentDidUpdate( _ , prevState) {
-    const { page, query } = this.state;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!query) {
+        return;
+      }
 
-    if (
-      prevState.page !== this.state.page ||
-      prevState.query !== this.state.query
-    ) {
-      this.setState({ status: 'loading' });
+      setStatus('loading');
 
-      await fetchImg(query, page)
-        .then(e =>
-          this.setState(prevState => ({
-            pictures: [...prevState.pictures, ...e.hits],
-            status: '',
-            loadMore: 12 - e.hits.length,
-          }))
-        )
-        .catch(error => console.log(error));
-    }
-  }
+      try {
+        const data = await fetchImg(query, page);
+        setPictures(prevPictures => [...prevPictures, ...data.hits]);
+        setStatus('');
+        setLoadMore(12 - data.hits.length);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  render() {
-    const { pictures, loadMore, largeImageUrl, showModal, status } = this.state;
-    return (
-      <div className={css.App}>
-        <Searchbar onSubmit={this.searchResult} />
-        {showModal && (
-          <Modal imgUrl={largeImageUrl} onClose={this.toggleModal} />
-        )}
-      {pictures.length > 0 && (
-          <GalleryList pictures={pictures} onClickImg={this.largeImage} />
+    fetchData();
+  }, [query, page]);
+
+  return (
+    <div className={css.App}>
+      <Searchbar onSubmit={searchResult} />
+      {showModal && (
+        <Modal imgUrl={largeImageUrl} onClose={toggleModal} />
       )}
-        {loadMore === 0 && <LoadMoreBtn onClick={this.handleLoadMore} />}
-        {status === "loading" && <Loader/>}
-      </div>
-    );
-  }
+      {pictures.length > 0 && (
+        <GalleryList pictures={pictures} onClickImg={largeImage} />
+      )}
+      {loadMore === 0 && <LoadMoreBtn onClick={handleLoadMore} />}
+      {status === "loading" && <Loader/>}
+    </div>
+  );
 }
+
+export default App;
